@@ -40,9 +40,9 @@ var button = ccui.Button.extend({
 		}*/
 });
 
-var PopUp = cc.Layer.extend({
+var PopUp = cc.LayerColor.extend({
 	ctor: function() {
-		this._super(cc.color.BLACK);
+		this._super(cc.color.GREEN);
 		var size = cc.winSize/2;
 		return true;
 	},
@@ -83,6 +83,11 @@ var uiLayer = cc.LayerColor.extend({
 		{
 			var label = event.getCurrentTarget();
 			var popup = new PopUp();
+			
+			var scene = cc.director.getRunningScene();
+			var p = new PopUp();
+			scene.addChild(p);
+			cc.log(scene)
 			//Add keycode table here
 			cc.log(keyCode);
 		},
@@ -93,14 +98,13 @@ var GameScene = cc.Scene.extend({
         this._super();
         var layer = new uiLayer();
         this.addChild(layer);
-
 		var size = cc.winSize;
 		var but = new button();
 		but.x = size.width / 2;
         but.y = size.height / 2;
 		but.scale = 0.2;
 		layer.addChild(but);
-		
+
 
     }
 });
