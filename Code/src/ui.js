@@ -1,3 +1,4 @@
+var pause = false;
 var mainMenu = function() {
 
 
@@ -139,11 +140,11 @@ var uiLayer = cc.Layer.extend({
         // 3. add your codes below...
         // add a label shows "Hello World"
         // create and initialize a label
-        var testLabel = new cc.LabelTTF("Test Button", "Arial", 38);
+        //var testLabel = new cc.LabelTTF("Test Button", "Arial", 38);
         // position the label on the center of the screen
-        testLabel.x = size.width / 2;
-        testLabel.y = size.height / 2 + 200;
-		this.addChild(testLabel, 5);
+        //testLabel.x = size.width / 2;
+        //testLabel.y = size.height / 2 + 200;
+		//this.addChild(testLabel, 5);
 
 		cc.eventManager.addListener(
 			cc.EventListener.create ({
@@ -155,12 +156,20 @@ var uiLayer = cc.Layer.extend({
 					
 	onKeyPressed: function(keyCode, event)
 		{
+			pause = !pause;
 			var label = event.getCurrentTarget();
 			var popup = new PopUp();
 			
 			var scene = cc.director.getRunningScene();
 			var p = new PopUp();
 			scene.addChild(p);
+			if (pause)
+			{
+				cc.director.pause();
+			}
+			else if (!pause) {
+				cc.director.resume();
+			}
 			cc.log(scene)
 			//Add keycode table here
 			cc.log(keyCode);
