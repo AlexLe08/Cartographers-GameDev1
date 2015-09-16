@@ -1,3 +1,5 @@
+// Main File
+// create the game scene
 var GameScene = cc.Scene.extend({
     onEnter:function () {
         this._super();

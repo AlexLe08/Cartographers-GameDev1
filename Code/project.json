@@ -18,6 +18,7 @@
 		"src/location.js",
 		"src/connector.js",
 		"src/mainmap.js",
+		"src/layer.js",
         "src/app.js"
     ]
 }

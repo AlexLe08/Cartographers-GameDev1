@@ -1,3 +1,5 @@
+// Map Object
+// controls all inputs and manipulations of the game world
 var MapObject = cc.Layer.extend ({
 	ctor: function () {
 		this._super();
