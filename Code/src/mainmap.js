@@ -13,7 +13,8 @@ var MapObject = cc.Layer.extend ({
 		this.locations = [];
 		this.connections = [];
 		
-		this.connection_stack = [];
+		this.persistent = []; // records 
+		this.temporary = [];
 		
 		this.loclabel = new cc.LabelTTF( "", "Arial", 24, cc.size(0,0), cc.TEXT_ALIGNMENT_CENTER );
 		this.loclabel.enableStroke( new cc.Color( 0,0,0,255 ), 2 );
@@ -25,6 +26,13 @@ var MapObject = cc.Layer.extend ({
 				event: cc.EventListener.MOUSE,
 				onMouseMove: this.onMouseOver,
 				onMouseUp: this.onMouseUp,
+			}), this);
+			
+		cc.eventManager.addListener (
+			cc.EventListener.create ({
+				event: cc.EventListener.KEYBOARD,
+				onKeyPressed: this.onKeyPressed,
+				onKeyReleased: this.onKeyReleased
 			}), this);
 		
 		return true;
@@ -181,5 +189,15 @@ var MapObject = cc.Layer.extend ({
 		} else {
 			this._node.deselectBoat();
 		}
+	},
+	
+	
+	
+	onKeyPressed:function(kc,event) {
+	},
+	
+	onKeyReleased:function(kc,event) {
+		
 	}
+	
 });
