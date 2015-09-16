@@ -13,6 +13,11 @@
     "jsList" : [
         "src/resource.js",
 		"src/ui.js",
+		"src/global.js",
+		"src/boat.js",
+		"src/location.js",
+		"src/connector.js",
+		"src/mainmap.js",
         "src/app.js"
     ]
 }
