@@ -2,7 +2,7 @@ var pause = false;
 var mainMenu = function() {
 
 
-	var menuScene = cc.Scene.extend({
+	this.Scene = cc.Scene.extend({
 		onEnter:function () {
 			this._super();
 			var layer = new menuLayer();
@@ -10,13 +10,13 @@ var mainMenu = function() {
 			this.addChild(layer);
 			}
 		});
-	var menuLayer = cc.Layer.extend({
+	this.Layer = cc.LayerColor.extend({
 		ctor: function(){
-		this._super;
+			this._super(cc.color.GREEN);
 		},
 		init: function() {
 			
-			this._super();
+			this._super(cc.color.GREEN);
 			var director = cc.Director.getInstance();
 			var winsize = director.getWinSize();
 			var centerpos = cc.p(winsize.width/2,winsize.height/2);
@@ -47,7 +47,10 @@ var uiManager = function() {
 	this.pauseState = false;
 	
 	var pauseMenu = new PopUp();
-	var menu = new menuScene();
+	var menu = new mainMenu();
+	var menuScene = menu.Scene;
+	var menuLayer = menu.Layer;
+	menuScene.addChild(menuLayer);
 	this.togglePause = function(){
 		pauseState = !pauseState;
 		if (pauseState) {
@@ -156,23 +159,41 @@ var uiLayer = cc.Layer.extend({
 					
 	onKeyPressed: function(keyCode, event)
 		{
-			pause = !pause;
-			var label = event.getCurrentTarget();
-			var popup = new PopUp();
-			
+			var tar = event.getCurrentTarget();			
 			var scene = cc.director.getRunningScene();
-			var p = new PopUp();
-			scene.addChild(p);
-			if (pause)
+			
+			//console.log(label);
+				switch(keyCode) {
+					case 80:
+						pause = !pause;
+						var p = new PopUp();
+						scene.addChild(p,100)
+						p.setPosition(0,cc.winSize.height*2);
+
+						if (pause) {
+							//tween to position above screen.
+							var moveIn = new cc.EaseBounceIn(new cc.MoveTo(0,cc.winSize.height*2),3);
+							p.runAction(moveIn);
+							console.log(p.getPosition())
+							cc.director.pause();
+						}
+						else {
+							var moveOut = new cc.EaseBounceIn(new cc.MoveTo(cc.winSize.width/2,cc.winSize.height/2),3);
+							p.runAction(moveOut);
+							cc.director.resume();
+						}
+				}
+			
+			/*if (pause)
 			{
 				cc.director.pause();
 			}
 			else if (!pause) {
 				cc.director.resume();
-			}
-			cc.log(scene)
+			}*/
+			//cc.log(scene)
 			//Add keycode table here
-			cc.log(keyCode);
+			//cc.log(keyCode);
 		},
 
 });
