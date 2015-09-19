@@ -19,22 +19,58 @@ var Boat = cc.Sprite.extend ({
 		this.hovered = false;
 		this.selected = false;
 		this.in_transit = false;
+		this.queued = [];
+		this.destination = null;
 		
 		return true;
 	},
-	
-	// redundant calls for docking and undocking
-	// operation takes place in the dock
-	unDock:function() {
+	move:function( q ) {
+		this.destination = this.dock;
 		this.dock.boatIsDeparting( this );
+		
+		this.queued = q.slice();
+		this.in_transit = true;
+		this.moveNext();
 	},
-	Dock:function( ndock ) {
-		ndock.boatIsDocking( this );
+	moveNext:function() {
+		if ( this.queued.length > 0 ) {
+			var next = this.queued[0];
+			this.queued.shift();
+			
+			this.setPosition( next.getEndpoint( this.destination ) );
+			this.destination = next.getOther( this.destination );
+			
+			var posother = next.getEndpoint( this.destination );
+			this.runAction(
+				cc.sequence(
+					cc.moveTo( next.getFullLength() / this.speed, cc.p(posother.x,posother.y),0 ),
+					cc.callFunc( this.moveNext, this )
+				)
+			);
+		} else {
+			this.destination.boatIsDocking( this );
+		}
 	},
-	// this function is used for boats in transit
-	syncDock:function() {
-		if ( !this.in_transit )
-			console.log( "WARNING: calling dock sync while boat "+this.name+" not in transit" );
-		this.dock.boatIsDocking( this );
+	setHovered:function() {
+		this.setScale( 0.8 );
+		this.hovered = true;
 	},
+	setNotHovered:function() {
+		if ( !this.selected ) {
+			this.setScale( 0.6 );
+			this.hovered = false;
+		}
+	},
+	checkMouseOver:function( pt ) {
+		var frame = this.getSpriteFrame();
+		if ( ( !this.in_transit ) &&
+			 ( Math.abs( pt.x - this.x ) < frame.getRectInPixels().width * this.getScaleX() / 2 &&
+			   Math.abs( pt.y - this.y ) < frame.getRectInPixels().height * this.getScaleY() / 2 ) ) {
+			this.setHovered();
+			return true;
+		} else {
+			this.setNotHovered();
+			return false;
+		}
+	}
 });

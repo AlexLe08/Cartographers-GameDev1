@@ -1,3 +1,6 @@
+var LocationVisibleHover = 255;
+var LocationBoatDistance = 16;
+
 var LocationHover = cc.DrawNode.extend({
 	ctor:function() {
 		this._super();
@@ -46,25 +49,50 @@ var LocationNode = cc.Layer.extend({
 		this.caravans = [];
 		this.connections = [];
 		
+		// for BFS
+		this.prev = null;
+		this.cref = null;
+		
+		// text label
+		this.namelabel = new cc.LabelTTF( this.name, "Arial", 16, cc.size(0,0), cc.TEXT_ALIGNMENT_CENTER );
+		
+		this.namelabel.x = this.posx;
+		this.namelabel.y = this.posy;
+		
+		this.namelabel.setOpacity( 0 );
+		this.namelabel.enableStroke( new cc.Color( 0,0,0,255 ), 2 );
+		
+		this.namelabel.setString( this.name );
+		
 		this.hovered = new LocationHover();
 		this.resting = new LocationNoHover();
 		
 		this.is_hovering = false;
+		
+		this.addChild( this.namelabel, 9999 );
 		this.addChild( this.hovered );
 		this.addChild( this.resting );
+		
 		this.hovered.setVisible( false );
 		
 		return true;
 		
 	},
-	setHovered:function( bool ) {
+	setHovered:function( dist, bool ) {
 		if ( bool == undefined || bool ) {
 			if ( !this.is_hovering ) {
 				this.is_hovering = true;
 				this.hovered.setVisible( true );
 				this.resting.setVisible( false );
+				this.namelabel.setOpacity( 255 );
 			}
 		} else {
+			var rdist = dist - this.radius;
+			if ( rdist <= LocationVisibleHover ) {
+				var opac = rdist / LocationVisibleHover;
+				this.namelabel.setOpacity( 255 * (1-opac) );
+			} else
+				this.namelabel.setOpacity( 0 );
 			if ( this.is_hovering ) {
 				this.is_hovering = false;
 				this.hovered.setVisible( false );
@@ -94,8 +122,8 @@ var LocationNode = cc.Layer.extend({
 		boat.dock = this;
 		boat.in_transit = false;
 		
-		boat.x = this.posx + ( this.radius + 16 ) * Math.cos( Math.PI / 4 * ( 1 - boat.docking_position) );
-		boat.y = this.posy + ( this.radius + 16 ) * Math.sin( Math.PI / 4 * ( 1 - boat.docking_position ) );
+		boat.x = this.posx + ( this.radius + LocationBoatDistance ) * Math.cos( Math.PI / 4 * ( 1 - boat.docking_position) );
+		boat.y = this.posy + ( this.radius + LocationBoatDistance ) * Math.sin( Math.PI / 4 * ( 1 - boat.docking_position ) );
 		
 		console.log( boat.name+" docks at "+this.name+": "+boat.docking_position );
 		return true;
@@ -116,5 +144,16 @@ var LocationNode = cc.Layer.extend({
 		
 		return true;
 		
+	},
+	checkMouseOver:function( pt ) {
+		var dst = ptdistance( cc.p( this.posx, this.posy ), pt );
+		if ( dst < this.radius ) {
+			this.setHovered( dst, true );
+			return [true,dst];
+		} else {
+			this.setHovered( dst, false );
+			return [false,dst];
+		}
 	}
+	
 });

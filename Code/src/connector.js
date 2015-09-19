@@ -29,8 +29,10 @@ var ConnectionHighlighted = cc.DrawNode.extend({
 	}
 });
 var ConnectionNode = cc.Layer.extend({
-	ctor:function( _node1, _node2 ) {
+	ctor:function( _name, _node1, _node2 ) {
 		this._super();
+		
+		this.name = _name;
 		
 		this.node1 = _node1;
 		this.node2 = _node2;
@@ -99,3 +101,45 @@ var ConnectionNode = cc.Layer.extend({
 						   cc.p( this.node2.posx, this.node2.posy) );
 	}
 });
+
+// returns an array of connectors that will connect location 1 and 2
+// if no path can be found then a "null" is passed
+var pathObject = function( location1, location2 ) {
+	var stack_store = [];
+	var q = new search_t();
+	var tmp = location1;
+	
+	stack_store.push( tmp );
+	tmp.prev = tmp;
+	while ( tmp != location2 ) {
+		for ( var i=0;i<tmp.connections.length;i++ ) {
+			var other = tmp.connections[i].getOther( tmp );
+			if ( other.prev == null ) {
+				stack_store.push( other );
+				q.push( tmp.connections[i],
+						tmp.connections[i].getFullLength() );
+			}
+		}
+		if ( q.size() == 0 ) {
+			return null;
+		} else {
+			var connect = q.pop();
+			if ( connect.node1.prev == null ) {
+				tmp = connect.node1;
+				tmp.prev = connect.node2;
+			} else {
+				tmp = connect.node2;
+				tmp.prev = connect.node1;
+			}
+		}
+	}
+	var ret = [];
+	while ( tmp != location1 ) {
+		ret.push( tmp.seekConnection( tmp.prev ) );
+		tmp = tmp.prev;
+	}
+	for ( var i=0;i<stack_store.length;i++ ) {
+		stack_store[i].prev = null;
+	}
+	return ret.reverse();
+};

@@ -5,17 +5,20 @@ var GameLayer = cc.Layer.extend({
 		
 		var size = cc.winSize;
 		
-		var MainMap = new MapObject();
+		var MainMap = new MapObject( "The World" );
 		
 		var loc1 = new LocationNode( "London", 200,300,16 );
-		var loc2 = new LocationNode( "France", 500,400,10 );
+		var loc2 = new LocationNode( "France", 300,100,10 );
 		var loc3 = new LocationNode( "Underpants", 520,160,18 );
 		var loc4 = new LocationNode( "Murrica", 100,200,20 );
+		var loc5 = new LocationNode( "Africa", 500,300,18 );
 		
-		var con1 = new ConnectionNode( loc1, loc2 );
-		var con2 = new ConnectionNode( loc2, loc3 );
-		var con3 = new ConnectionNode( loc3, loc1 );
-		var con4 = new ConnectionNode( loc1, loc4 );
+		var con1 = new ConnectionNode( "The Channel", loc1, loc2 );
+		var con2 = new ConnectionNode( "Boxers", loc2, loc3 );
+		var con3 = new ConnectionNode( "Briefs", loc3, loc1 );
+		var con4 = new ConnectionNode( "Atlantic", loc1, loc4 );
+		var con5 = new ConnectionNode( "Mediterranean", loc1, loc5 );
+		var con6 = new ConnectionNode( "Panties", loc3, loc5 );
 		
 		var b1 = new Boat( "SS Will",10 );
 		var b2 = new Boat( "SS Nick",20 );
@@ -33,11 +36,14 @@ var GameLayer = cc.Layer.extend({
 		MainMap.addLocation( loc2 );
 		MainMap.addLocation( loc3 );
 		MainMap.addLocation( loc4 );
+		MainMap.addLocation( loc5 );
 		
 		MainMap.addConnection( con1 );
 		MainMap.addConnection( con2 );
 		MainMap.addConnection( con3 );
 		MainMap.addConnection( con4 );
+		MainMap.addConnection( con5 );
+		MainMap.addConnection( con6 );
 		
 		MainMap.addBoat( b1 );
 		MainMap.addBoat( b2 );
