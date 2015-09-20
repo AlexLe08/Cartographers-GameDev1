@@ -29,50 +29,50 @@ var ConnectionHighlighted = cc.DrawNode.extend({
 	}
 });
 var ConnectionNode = cc.Layer.extend({
-	ctor:function( _name, _node1, _node2 ) {
+	ctor:function( _name, _type, _node1, _node2 ) {
 		this._super();
 		
 		this.name = _name;
+		this.type = _type;
 		
 		this.node1 = _node1;
 		this.node2 = _node2;
 		
-		var N1ToN2 = Math.atan2( _node2.posy - _node1.posy, _node2.posx - _node1.posx );
-		var N2ToN1 = Math.atan2( _node1.posy - _node2.posy, _node1.posx - _node2.posx );
+		var N1ToN2 = Math.atan2( _node2.y - _node1.y, _node2.x - _node1.x );
+		var N2ToN1 = Math.atan2( _node1.y - _node2.y, _node1.x - _node2.x );
 		
-		var n1x = _node1.posx + ( 16 + 2 * ConnectionWidth + _node1.radius ) * Math.cos( N1ToN2 );
-		var n1y = _node1.posy + ( 16 + 2 * ConnectionWidth + _node1.radius ) * Math.sin( N1ToN2 );
-		var n2x = _node2.posx + ( 16 + 2 * ConnectionWidth + _node2.radius ) * Math.cos( N2ToN1 );
-		var n2y = _node2.posy + ( 16 + 2 * ConnectionWidth + _node2.radius ) * Math.sin( N2ToN1 );
+		var n1x = _node1.x + ( LocationMovableDistance + 2 * ConnectionWidth + _node1.radius ) * Math.cos( N1ToN2 );
+		var n1y = _node1.y + ( LocationMovableDistance + 2 * ConnectionWidth + _node1.radius ) * Math.sin( N1ToN2 );
+		var n2x = _node2.x + ( LocationMovableDistance + 2 * ConnectionWidth + _node2.radius ) * Math.cos( N2ToN1 );
+		var n2y = _node2.y + ( LocationMovableDistance + 2 * ConnectionWidth + _node2.radius ) * Math.sin( N2ToN1 );
 		
 		this.pos1 = new cc.Point( n1x, n1y );
 		this.pos2 = new cc.Point( n2x, n2y );
 		
 		this.highlighted = new ConnectionHighlighted( cc.p(n1x,n1y), cc.p(n2x,n2y) );
-		this.unhighlighted = new ConnectionUnhighlighted( cc.p(n1x,n1y), cc.p(n2x,n2y) );
 		
-		this.is_highlighted = false;
+		this.is_highlighted = 0;
 		this.addChild( this.highlighted );
-		this.addChild( this.unhighlighted );
-		this.highlighted.setVisible( false );
+		if ( _type & GLOBAL_WATER )
+			this.highlighted.setVisible( false );
 		
 		this.node1.connections.push( this );
 		this.node2.connections.push( this );
 		
 		return true;
 	},
-	setHighlighted:function( bool ) {
+	setHighlighted:function( bits, bool ) {
 		if ( bool == undefined || bool ) {
-			if ( !this.is_highlighted ) {
-				this.is_highlighted = true;
+			if ( this.is_highlighted == 0 ) {
 				this.highlighted.setVisible( true );
-				this.unhighlighted.setVisible( false );
 			}
+			console.log( "HIGHLIGHT   "+this.is_highlighted );
+			this.is_highlighted |= bits;
 		} else {
-			if ( this.is_highlighted ) {
-				this.is_highlighted = false;
+			console.log( "UNHIGHLIGHT "+this.is_highlighted );
+			this.is_highlighted &= ~bits;
+			if ( this.is_highlighted == 0 ) {
 				this.highlighted.setVisible( false );
-				this.unhighlighted.setVisible( true );
 			}
 		}
 	},
@@ -97,48 +97,63 @@ var ConnectionNode = cc.Layer.extend({
 	},
 	getFullLength:function() {
 		
-		return ptdistance( cc.p( this.node1.posx, this.node1.posy), 
-						   cc.p( this.node2.posx, this.node2.posy) );
+		return ptdistance( cc.p( this.node1.x, this.node1.y), 
+						   cc.p( this.node2.x, this.node2.y) );
 	}
 });
 
 // returns an array of connectors that will connect location 1 and 2
-// if no path can be found then a "null" is passed
-var pathObject = function( location1, location2 ) {
+// if no path can be found then an empty array is passed
+var pathObject = function( type, location1, location2 ) {
 	var stack_store = [];
 	var q = new search_t();
 	var tmp = location1;
+	var pathfailed = false;
 	
 	stack_store.push( tmp );
 	tmp.prev = tmp;
+	console.log( "------------------------------------------------" );
+	console.log( "Set "+tmp.name );
 	while ( tmp != location2 ) {
 		for ( var i=0;i<tmp.connections.length;i++ ) {
-			var other = tmp.connections[i].getOther( tmp );
-			if ( other.prev == null ) {
-				stack_store.push( other );
-				q.push( tmp.connections[i],
-						tmp.connections[i].getFullLength() );
+			if ( tmp.connections[i].type & type ) {
+				var other = tmp.connections[i].getOther( tmp );
+				if ( other.prev == null ) {
+					stack_store.push( other );
+					q.push( tmp.connections[i],
+							tmp.connections[i].getFullLength() );
+					console.log( "    Touch "+other.name );
+				}
 			}
 		}
-		if ( q.size() == 0 ) {
-			return null;
-		} else {
+		var foundone = false;
+		while ( !foundone && q.size() != 0 ) {
 			var connect = q.pop();
 			if ( connect.node1.prev == null ) {
 				tmp = connect.node1;
 				tmp.prev = connect.node2;
-			} else {
+				foundone = true;
+			} else if ( connect.node2.prev == null ){
 				tmp = connect.node2;
 				tmp.prev = connect.node1;
+				foundone = true;
 			}
+		}
+		console.log( "Set "+tmp.name );
+		if ( q.size() == 0 ) {
+			pathfailed = true;
+			break;
 		}
 	}
 	var ret = [];
-	while ( tmp != location1 ) {
-		ret.push( tmp.seekConnection( tmp.prev ) );
-		tmp = tmp.prev;
+	if ( !pathfailed ) {
+		while ( tmp != location1 ) {
+			ret.push( tmp.seekConnection( tmp.prev ) );
+			tmp = tmp.prev;
+		}
 	}
 	for ( var i=0;i<stack_store.length;i++ ) {
+		console.log( "Unset "+stack_store[i].name );
 		stack_store[i].prev = null;
 	}
 	return ret.reverse();

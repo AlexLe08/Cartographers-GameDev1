@@ -1,15 +1,22 @@
 // Movable Object
 // extends sprite
-var Boat = cc.Sprite.extend ({
-	ctor: function ( _name, _speed ) {
-		this._super(res.boat_png);
-		
+var Movable = cc.Sprite.extend ({
+	ctor: function ( _name, _type, _speed ) {
 		// user input
 		this.name = _name;
+		this.type = _type;
 		if ( _speed == undefined )
 			this.speed = 64;
 		else
 			this.speed = _speed;
+		
+		if ( _type == GLOBAL_WATER ) {
+			this._super(res.boat_png);
+		} else if ( _type == GLOBAL_LAND ) {
+			console.log( "ERROR: no caravan sprites yet" );
+		} else {
+			console.log( "ERROR: movable must be land or water" );
+		}
 		
 		// defined later
 		this.x = 0;
@@ -25,12 +32,14 @@ var Boat = cc.Sprite.extend ({
 		return true;
 	},
 	move:function( q ) {
-		this.destination = this.dock;
-		this.dock.boatIsDeparting( this );
-		
-		this.queued = q.slice();
-		this.in_transit = true;
-		this.moveNext();
+		if ( q.length > 0 ) {
+			this.destination = this.dock;
+			this.dock.boatIsDeparting( this );
+			
+			this.queued = q.slice();
+			this.in_transit = true;
+			this.moveNext();
+		}
 	},
 	moveNext:function() {
 		if ( this.queued.length > 0 ) {
