@@ -1,6 +1,2 @@
-Ship Frame dimensions: 512x385
-
-Nodes: 896-512 x 385
-
 Old paper from
 http://ftourini.deviantart.com/art/old-paper-stock-02-256716612
