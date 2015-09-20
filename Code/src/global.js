@@ -1,6 +1,7 @@
 // GLOBAL Variable Values
 var ConnectionWidth = 6; 	// size of the connecting lines
 var LocationIncrease = 4; 	// increase in size of a slot on hover
+var _pause = false;
 
 // find the distance between two points
 var ptdistance = function ( a, b ) {
