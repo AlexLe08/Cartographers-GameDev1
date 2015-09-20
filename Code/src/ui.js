@@ -123,6 +123,7 @@ var PopUp = cc.LayerColor.extend({
 		this._super(cc.color.GREEN);
 		var size = cc.winSize/2;
 		return true;
+		
 	},
 });
 
@@ -138,7 +139,7 @@ var uiLayer = cc.Layer.extend({
         //    you may modify it.
         // ask the window size
         var size = cc.winSize;
-		
+
         /////////////////////////////
         // 3. add your codes below...
         // add a label shows "Hello World"
@@ -148,7 +149,7 @@ var uiLayer = cc.Layer.extend({
         //testLabel.x = size.width / 2;
         //testLabel.y = size.height / 2 + 200;
 		//this.addChild(testLabel, 5);
-
+		
 		cc.eventManager.addListener(
 			cc.EventListener.create ({
 				event: cc.EventListener.KEYBOARD,
@@ -166,21 +167,20 @@ var uiLayer = cc.Layer.extend({
 				switch(keyCode) {
 					case 80:
 						pause = !pause;
-						var p = new PopUp();
-						scene.addChild(p,100)
-						p.setPosition(0,cc.winSize.height*2);
-
+						
 						if (pause) {
 							//tween to position above screen.
-							var moveIn = new cc.EaseBounceIn(new cc.MoveTo(0,cc.winSize.height*2),3);
+							var moveTweenIn = cc.MoveTo.create(3,cc.p(cc.winSize.width/3,cc.winSize.height/3));
+							var moveIn = cc.EaseBounceIn.create(moveTweenIn);
 							p.runAction(moveIn);
 							console.log(p.getPosition())
-							cc.director.pause();
+							//cc.director.pause();
 						}
 						else {
-							var moveOut = new cc.EaseBounceIn(new cc.MoveTo(cc.winSize.width/2,cc.winSize.height/2),3);
+							var moveTweenOut = cc.MoveTo.create(3,cc.p(cc.winSize.width/3,cc.winSize.height*2));
+							var moveOut = cc.EaseBounceIn.create(moveTweenOut);
 							p.runAction(moveOut);
-							cc.director.resume();
+							//cc.director.resume();
 						}
 				}
 			
