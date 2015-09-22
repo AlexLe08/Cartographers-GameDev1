@@ -1,33 +1,45 @@
-var hud = function() {
-	this.addHud = function() {
-		var Layer = cc.Layer.extend({
-		ctor: function(){
-			this._super();
-		},
-		init: function() {
-			
-			this._super();
-			var director = cc.Director.getInstance();
-			var winsize = director.getWinSize();
-			var centerpos = cc.p(winsize.width/2,winsize.height/2);
-			//var spritebg == cc.Sprite.create(bg img)
-			//bg.setPosition(centerpos)
-			//this.addChild(spritebg);
-			cc.MenuItemFont.setFontSize(60)
-			var menuItemPlay= cc.MenuItemSprite.create(
-			cc.Sprite.create(s_start_n), // normal state image
-			cc.Sprite.create(s_start_s), //select state image
-			this.onPlay, this);
-			var menu = cc.Menu.create(menuItemPlay);  //7. create the menu
-			menu.setPosition(centerpos);
-			this.addChild(menu);
-			},
-			onPlay : function(){
-			cc.log("== on play clicked");
-			}
-	});
-			this.addChild(layer);
-	}
-	
+var StatusLayer = cc.Layer.extend({
+	labelFood: null,
+	labelGold: null,
+	labelScore: null,
 
-};
+	ctor: function() {
+		this._super();
+		this.init();
+	},
+	init: function() {
+		var winSize = cc.director.getWinSize();
+		
+		this.labelGold = new cc.LabelTTF( "Coins:0", "Helvetica",20);
+		this.labelGold.setColor(cc.color(255,255,0));
+		this.labelGold.setPosition(cc.p(winSize.width - 70, winSize.height - 40));
+		
+		this.labelFood = new cc.LabelTTF( "Food:0", "Helvetica",20);
+		this.labelFood.setColor(cc.color(255,255,0));
+		this.labelFood.setPosition(cc.p(winSize.width - 70, winSize.height - 20));
+		
+		this.labelScore = new cc.LabelTTF( "Score:0", "Helvetica",20);
+		this.labelScore.setColor(cc.color(255,255,0));
+		this.labelScore.setPosition(cc.p(winSize.width - 70, winSize.height - 60));
+		
+		this.addChild(this.labelGold);
+		this.addChild (this.labelFood);
+		this.addChild(this.labelScore);
+		},
+	updateGold: function(value) {
+		_gold += value;
+		var string = "Gold: " + _gold;
+		this.labelGold.setString(string);
+	},
+	updateFood: function(value) {
+		_food += value;
+		var string = "Food: " + _food;
+		this.labelGold.setString(string);
+	},
+	
+	updateScore: function(value) {
+		_score += value;
+		var string = "Score: " + _score;
+		this.labelScore.setString(string);
+	}
+})

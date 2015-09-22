@@ -23,6 +23,14 @@ var GameLayer = cc.Layer.extend({
 		var b4 = new Boat( "SS Alex",40 );
 		var b5 = new Boat( "SS Tommy",50 );
 		
+		var s1 = new Storm();
+		var s2 = new Storm();
+		var s3 = new Storm();
+		var s4 = new Storm();
+		var s5 = new Storm();
+		var s6 = new Storm();
+		var s7 = new Storm();
+		
 		loc2.boatIsDocking( b1 );
 		loc2.boatIsDocking( b2 );
 		loc1.boatIsDocking( b3 );
@@ -31,8 +39,8 @@ var GameLayer = cc.Layer.extend({
 		
 		MainMap.addLocation( loc1 );
 		MainMap.addLocation( loc2 );
-		MainMap.addLocation( loc3 );
 		MainMap.addLocation( loc4 );
+		MainMap.addLocation( loc3 );
 		
 		MainMap.addConnection( con1 );
 		MainMap.addConnection( con2 );
@@ -44,6 +52,14 @@ var GameLayer = cc.Layer.extend({
 		MainMap.addBoat( b3 );
 		MainMap.addBoat( b4 );
 		MainMap.addBoat( b5 );
+		
+		MainMap.addStorm(s1);
+		MainMap.addStorm(s2);
+		MainMap.addStorm(s3);
+		MainMap.addStorm(s4);
+		MainMap.addStorm(s5);
+		MainMap.addStorm(s6);
+		MainMap.addStorm(s7);
 		
 		this.addChild( MainMap );
 		

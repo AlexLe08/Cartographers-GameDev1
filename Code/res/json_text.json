@@ -1,0 +1,9 @@
+{
+  "events": [
+    {"storm":  ["Storm!","The waves are a bit rougher here."]}, 
+    {"fishing":[ "Go fish!","Hey, this looks like a good fishing spot!"]}, 
+    {"bandits": ["Bandits!","Some unruly fellows stop your caravan."]},
+    {"treasure": [ "Buried treasure?", "X marks the spot!"]},
+    {"spy": ["Friend or foe?","You have met someone new, but you’re not sure of their intentions…"]}
+  ]
+}
