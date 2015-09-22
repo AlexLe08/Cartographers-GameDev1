@@ -4,6 +4,8 @@ var res = {
 	boat_png : "res/sprite_boat.png",
 	popup_png : "res/popup_resize.png",
 	map_png: "res/bg_map.png",
+	spr_storm: "res/storm.png",
+	plist_storm: "res/storm.plist",
 };
 
 var g_resources = [];

@@ -19,6 +19,9 @@
 		"src/connector.js",
 		"src/mainmap.js",
 		"src/layer.js",
+		"src/event.js",
+		"src/hud.js",
+		"src/storm.js",
         "src/app.js"
     ]
 }

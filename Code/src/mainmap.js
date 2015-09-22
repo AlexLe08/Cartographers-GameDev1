@@ -12,6 +12,7 @@ var MapObject = cc.Layer.extend ({
 		this.movables = []
 		this.locations = [];
 		this.connections = [];
+		this.storms = [];
 		
 		this.connection_stack = [];
 		
@@ -33,6 +34,10 @@ var MapObject = cc.Layer.extend ({
 		butt.setScale( 0.6 );
 		this.movables.push( butt );
 		this.addChild( butt,this.movables.length + 10 );
+	},
+	addStorm: function ( storm ) {
+		this.storms.push( storm );
+		this.addChild( storm, 50 );
 	},
 	addLocation:function( loc ) {
 		this.locations.push( loc );

@@ -118,15 +118,6 @@ var button = ccui.Button.extend({
 		}*/
 });
 
-var PopUp = cc.LayerColor.extend({
-	ctor: function() {
-		this._super(cc.color.GREEN);
-		var size = cc.winSize/2;
-		return true;
-		
-	},
-});
-
 var uiLayer = cc.Layer.extend({
     sprite:null,
     ctor:function () {
@@ -139,16 +130,13 @@ var uiLayer = cc.Layer.extend({
         //    you may modify it.
         // ask the window size
         var size = cc.winSize;
+		
+		_event = new EventWindow();
+		//var eventWindow = new _event.Window();
+		
+		this.addChild(_event,100)
+		this.addChild(new StatusLayer());
 
-        /////////////////////////////
-        // 3. add your codes below...
-        // add a label shows "Hello World"
-        // create and initialize a label
-        //var testLabel = new cc.LabelTTF("Test Button", "Arial", 38);
-        // position the label on the center of the screen
-        //testLabel.x = size.width / 2;
-        //testLabel.y = size.height / 2 + 200;
-		//this.addChild(testLabel, 5);
 		
 		cc.eventManager.addListener(
 			cc.EventListener.create ({
@@ -165,23 +153,28 @@ var uiLayer = cc.Layer.extend({
 			
 			//console.log(label);
 				switch(keyCode) {
-					case 80:
+					case 80: // 'P' key
+						//flag pause
 						pause = !pause;
 						
 						if (pause) {
 							//tween to position above screen.
-							var moveTweenIn = cc.MoveTo.create(3,cc.p(cc.winSize.width/3,cc.winSize.height/3));
+							var moveTweenIn = cc.MoveTo.create(3,cc.p(cc.winSize.width/2,cc.winSize.height/2));
 							var moveIn = cc.EaseBounceIn.create(moveTweenIn);
-							p.runAction(moveIn);
-							console.log(p.getPosition())
+							_event.runAction(moveIn);
 							//cc.director.pause();
 						}
 						else {
 							var moveTweenOut = cc.MoveTo.create(3,cc.p(cc.winSize.width/3,cc.winSize.height*2));
 							var moveOut = cc.EaseBounceIn.create(moveTweenOut);
-							p.runAction(moveOut);
+							_event.runAction(moveOut);
 							//cc.director.resume();
 						}
+						break;
+					case 32:
+						console.log("space hit");
+						console.log("boat pos is: " + _eventBoat.x  + " , " + _eventBoat.y);
+						break;
 				}
 			
 			/*if (pause)
