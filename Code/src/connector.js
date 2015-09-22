@@ -41,10 +41,10 @@ var ConnectionNode = cc.Layer.extend({
 		var N1ToN2 = Math.atan2( _node2.y - _node1.y, _node2.x - _node1.x );
 		var N2ToN1 = Math.atan2( _node1.y - _node2.y, _node1.x - _node2.x );
 		
-		var n1x = _node1.x + ( LocationMovableDistance + 2 * ConnectionWidth + _node1.radius ) * Math.cos( N1ToN2 );
-		var n1y = _node1.y + ( LocationMovableDistance + 2 * ConnectionWidth + _node1.radius ) * Math.sin( N1ToN2 );
-		var n2x = _node2.x + ( LocationMovableDistance + 2 * ConnectionWidth + _node2.radius ) * Math.cos( N2ToN1 );
-		var n2y = _node2.y + ( LocationMovableDistance + 2 * ConnectionWidth + _node2.radius ) * Math.sin( N2ToN1 );
+		var n1x = _node1.x + ( LocationMovableDistance + 2 * ConnectionWidth ) * Math.cos( N1ToN2 );
+		var n1y = _node1.y + ( LocationMovableDistance + 2 * ConnectionWidth ) * Math.sin( N1ToN2 );
+		var n2x = _node2.x + ( LocationMovableDistance + 2 * ConnectionWidth ) * Math.cos( N2ToN1 );
+		var n2y = _node2.y + ( LocationMovableDistance + 2 * ConnectionWidth ) * Math.sin( N2ToN1 );
 		
 		this.pos1 = new cc.Point( n1x, n1y );
 		this.pos2 = new cc.Point( n2x, n2y );
@@ -53,8 +53,7 @@ var ConnectionNode = cc.Layer.extend({
 		
 		this.is_highlighted = 0;
 		this.addChild( this.highlighted );
-		if ( _type & GLOBAL_WATER )
-			this.highlighted.setVisible( false );
+		this.highlighted.setVisible( false );
 		
 		this.node1.connections.push( this );
 		this.node2.connections.push( this );
@@ -116,6 +115,7 @@ var pathObject = function( type, location1, location2 ) {
 	console.log( "Set "+tmp.name );
 	while ( tmp != location2 ) {
 		for ( var i=0;i<tmp.connections.length;i++ ) {
+			console.log( "    Attempt touch" );
 			if ( tmp.connections[i].type & type ) {
 				var other = tmp.connections[i].getOther( tmp );
 				if ( other.prev == null ) {
@@ -140,7 +140,8 @@ var pathObject = function( type, location1, location2 ) {
 			}
 		}
 		console.log( "Set "+tmp.name );
-		if ( q.size() == 0 ) {
+		if ( !foundone && q.size() == 0 ) {
+			console.log( "Path failed at "+tmp.name );
 			pathfailed = true;
 			break;
 		}

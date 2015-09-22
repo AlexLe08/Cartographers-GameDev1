@@ -13,7 +13,7 @@ var Movable = cc.Sprite.extend ({
 		if ( _type == GLOBAL_WATER ) {
 			this._super(res.boat_png);
 		} else if ( _type == GLOBAL_LAND ) {
-			console.log( "ERROR: no caravan sprites yet" );
+			this._super(res.boat_png);//console.log( "ERROR: no caravan sprites yet" );
 		} else {
 			console.log( "ERROR: movable must be land or water" );
 		}

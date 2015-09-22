@@ -1,15 +1,24 @@
 // Main File
 // create the game scene
+
 var GameScene = cc.Scene.extend({
     onEnter:function () {
         this._super();
-        //var layer = new uiLayer();
-        //this.addChild(layer, 100);
+		
+		// Not Will's Stuff
+        var ui = new uiLayer();
 
-		var col = cc.LayerColor.create( new cc.Color( 90,100,255,255 )  );
+		var centerPos = cc.p(cc.winSize.width / 2, cc.winSize.height /2);
+		//var background = cc.Sprite.create(res.map_png);
+		//background.setPosition(centerPos);
+
+		// Will's Stuff
         var layer = new GameLayer();
-		this.addChild(col, 4);
+	
+		//this.addChild(background, 4);
         this.addChild(layer, 5);
+		this.addChild(ui, 6);
+
     }
-});
+}); 
 

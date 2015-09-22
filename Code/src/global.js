@@ -1,6 +1,16 @@
 // GLOBAL Variable Values
 var ConnectionWidth = 6; 	// size of the connecting lines
 var LocationIncrease = 4; 	// increase in size of a slot on hover
+var _pause = false;
+
+// resources
+var _food = 0;
+var _gold = 0;
+// total player score
+var _score = 0;
+var _eventTrigger = true;
+var _event = null;
+var _eventBoat = null;
 
 var LocationVisibleHover = 255;
 var LocationMovableDistance = 10;
@@ -21,4 +31,8 @@ var ptdistance = function ( a, b ) {
 
 var ptdeterminant = function( a, b ) {
 	return a.x*b.y - a.y*b.x;
+}
+
+var randomInt = function(min,max) {
+	return Math.floor(Math.random() * (max - min)) + min;
 }

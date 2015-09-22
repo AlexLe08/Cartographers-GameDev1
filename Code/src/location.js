@@ -32,6 +32,14 @@ var LocationNoHover = cc.DrawNode.extend({
 						 new cc.Color( 30,40,90,255 ) );
 	}
 });
+var LocationPin = cc.Sprite.extend({
+	ctor:function() {
+		this._super( res.land_marker_png );
+	},
+	onEnter:function() {
+		this.setScale( this.parent.calcScale( 1 ) );
+	}
+});
 var LocationNode = cc.Layer.extend({
 	ctor:function (_name, _type, _x, _y, _r) {
 		this._super();
@@ -41,6 +49,9 @@ var LocationNode = cc.Layer.extend({
 		this.x = _x;
 		this.y = _y;
 		this.radius = _r;
+		this.real_scale = _r / 320.0;
+		
+		this.setAnchorPoint( 0.38157894736842105263157894736842, 0 );
 		
 		this.boatslots = [];
 		this.boats = [];
@@ -59,26 +70,39 @@ var LocationNode = cc.Layer.extend({
 		
 		this.namelabel.setString( this.name );
 		
-		this.hovered = new LocationHover();
-		this.resting = new LocationNoHover();
+		this.pin = new LocationPin();
 		
 		this.is_hovering = false;
 		
 		this.addChild( this.namelabel, 9999 );
-		this.addChild( this.hovered );
-		this.addChild( this.resting );
-		
-		this.hovered.setVisible( false );
+		this.addChild( this.pin );
 		
 		return true;
 		
+	},
+	calcScale:function( mod, shift ) {
+		return mod * this.real_scale;
+		/*var rshift;
+		if ( shift == undefined )
+			rshift = 0.5;
+		else
+			rshift = shift;
+		var rs = mod * this.real_scale;
+		return rshift * rs + ( 1 - rshift ) * rs / this.parent.scaleX;*/
+	},
+	updateScale:function() {
+		if ( this.is_hovering ) {
+			this.pin.setScale( this.calcScale( 1.4 ) );
+		} else {
+			this.pin.setScale( this.calcScale( 1.0 ) );
+		}
+		this.namelabel.setScale( this.calcScale() );
 	},
 	setHovered:function( dist, bool ) {
 		if ( bool == undefined || bool ) {
 			if ( !this.is_hovering ) {
 				this.is_hovering = true;
-				this.hovered.setVisible( true );
-				this.resting.setVisible( false );
+				this.pin.setScale( this.calcScale( 1.4 ) );
 				this.namelabel.setOpacity( 255 );
 			}
 		} else {
@@ -90,8 +114,7 @@ var LocationNode = cc.Layer.extend({
 				this.namelabel.setOpacity( 0 );
 			if ( this.is_hovering ) {
 				this.is_hovering = false;
-				this.hovered.setVisible( false );
-				this.resting.setVisible( true );
+				this.pin.setScale( this.calcScale( 1.0 ) );
 			}
 		}
 	},
@@ -141,7 +164,7 @@ var LocationNode = cc.Layer.extend({
 		
 	},
 	checkMouseOver:function( pt ) {
-		var dst = ptdistance( cc.p( this.x, this.y ), pt );
+		var dst = ptdistance( cc.p( this.x, this.y+this.radius/2 ), pt );
 		if ( dst < this.radius ) {
 			this.setHovered( dst, true );
 			return [true,dst];

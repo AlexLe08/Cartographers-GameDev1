@@ -1,11 +1,11 @@
-var MapMoveSpeed = 16;
+var MapMoveSpeed = 10;
 
 var MoveMapUp = 0;
 var MoveMapDown = 1;
 var MoveMapLeft = 2;
 var MoveMapRight = 3;
-var MoveMapZoomIn = 3;
-var MoveMapZoomOut = 3;
+var MoveMapZoomIn = 4;
+var MoveMapZoomOut = 5;
 
 // Map Object
 // controls all inputs and manipulations of the game world
@@ -31,9 +31,13 @@ var MapObject = cc.Layer.extend ({
 		this.addChild( this.boat_label );
 		this.boat_label.enableStroke( new cc.Color( 0,0,0,255 ), 2 );
 		
+		this.map_img = new cc.Sprite( res.map_large_png );
+		this.addChild( this.map_img );
+		
 		this.movables = [];	   // list of boats and caravans
 		this.locations = [];   // list of locations
 		this.connections = []; // list of connections
+		this.storms = []; // list of storms
 		
 		this.persistent = []; // records moves explicitly desired by the player
 		this.temporary = [];  // records the shortest path from one location to another
@@ -59,28 +63,36 @@ var MapObject = cc.Layer.extend ({
 		this.going = [false,false,false,false,false,false];
 		this.goact = [ cc.RepeatForever.create( cc.sequence( 
 							cc.moveBy( 0, cc.p(0,-MapMoveSpeed) ), 
-							cc.callFunc( this.handleHovering,this ) ) ),   //
+							cc.callFunc( this.callbackMapMove,this ) ) ),   //
 					   cc.RepeatForever.create( cc.sequence( 
 							cc.moveBy( 0, cc.p(0,MapMoveSpeed) ), 
-							cc.callFunc( this.handleHovering,this ) ) ),    //
+							cc.callFunc( this.callbackMapMove,this ) ) ),    //
 					   cc.RepeatForever.create( cc.sequence( 
 							cc.moveBy( 0, cc.p(MapMoveSpeed,0) ), 
-							cc.callFunc( this.handleHovering,this ) ) ),    //
+							cc.callFunc( this.callbackMapMove,this ) ) ),    //
 					   cc.RepeatForever.create( cc.sequence( 
 							cc.moveBy( 0, cc.p(-MapMoveSpeed,0) ), 
-							cc.callFunc( this.handleHovering,this ) ) ),   //
+							cc.callFunc( this.callbackMapMove,this ) ) ),   //
 					   cc.RepeatForever.create( cc.sequence( 
-							cc.scaleTo( 10, cc.p(0.95,0.95) ), 
-							cc.callFunc( this.handleHovering,this ) ) ),   //
+							cc.scaleBy( 0, 0.95, 0.95 ),
+							cc.callFunc( this.callbackMapMove,this ) ) ),   //
 					   cc.RepeatForever.create( cc.sequence( 
-							cc.scaleTo( 10, cc.p(1.05,1.05) ), 
-							cc.callFunc( this.handleHovering,this ) ) ) ]; //
+							cc.scaleBy( 0, 1.05,1.05 ), 
+							cc.callFunc( this.callbackMapMove,this ) ) ) ]; //
+							
+							
+		this.setAnchorPoint(0,0);
+		
 		return true;
 	},
 	addMovable:function( butt ) {
 		butt.setScale( 0.6 );
 		this.movables.push( butt );
 		this.addChild( butt,this.movables.length + 10 );
+	},
+	addStorm: function ( storm ) {
+		this.storms.push( storm );
+		this.addChild( storm, 50 );
 	},
 	addLocation:function( loc ) {
 		this.locations.push( loc );
@@ -145,9 +157,13 @@ var MapObject = cc.Layer.extend ({
 		}
 	},
 	
+	transformMouse:function() {
+		var sz = cc.p( cc.winSize.width, cc.winSize.height );
+		return cc.p( ( this.mousepos.x - this.x ) / this.scaleX, 
+					 ( this.mousepos.y - this.y ) / this.scaleY );
+	},
 	handleHovering:function( mpt ) {
-		console.log( "HANDLE" );
-		var pt = cc.p( this.mousepos.x-this.x, this.mousepos.y-this.y );
+		var pt = this.transformMouse();
 		var i = 0;
 		
 		//------------------------------------------------------------------
@@ -172,8 +188,6 @@ var MapObject = cc.Layer.extend ({
 							this.temporary = pathObject( this.select_boat.type, this.select_boat.dock, this.hover_location );
 							this.tempcap = this.hover_location;
 						} else {
-							console.log( "get temp from end" );
-							console.log( this.perscap.name );
 							this.temporary = pathObject( this.select_boat.type, this.perscap, this.hover_location );
 							this.tempcap = this.hover_location;
 						}
@@ -217,6 +231,8 @@ var MapObject = cc.Layer.extend ({
 	// Control what happens on the map when the mouse is released
 	onMouseUp:function(event) {
 		var self = this._node;
+		console.log( self.mousepos.x - self.x,
+					 self.mousepos.y - self.y );
 		if ( self.temporary.length > 0 && self.select_boat != null ) {
 			
 			if ( self.shift_held ) {
@@ -237,6 +253,9 @@ var MapObject = cc.Layer.extend ({
 		}
 	},
 	
+	callbackMapMove:function() {
+		this.handleHovering();
+	},
 	handleMapMove:function( evnum, bool ) {
 		if ( bool == undefined || bool ) {
 			if ( !this.going[evnum] )
@@ -250,7 +269,6 @@ var MapObject = cc.Layer.extend ({
 	},
 	
 	onKeyPressed:function(kc,event) {
-		console.log( "PR "+kc );
 		var self = this._node;
 		switch( kc ) {
 			case 38: // up
@@ -278,7 +296,6 @@ var MapObject = cc.Layer.extend ({
 	},
 	
 	onKeyReleased:function(kc,event) {
-		console.log( "RE "+kc );
 		var self = this._node;
 		switch( kc ) {
 			case 38: // up
