@@ -121,7 +121,17 @@ var EventWindow = cc.Layer.extend({
 		this.label.setPosition(150,310);
 		this.label.setFontSize("32");
 		this.addChild(this.label);
-		
+		this.JSON = null;
+		cc.loader.loadJson(res.json_text, function(err, data) {
+			if (err) {
+				cc.log("load JSON failed");
+			}
+			else {
+				this.JSON = data;
+				console.log(data);
+			}
+		});
+		this.flavor_text = new ccui.Text();
 		var lay = ccui.Layout.create();
 		lay.setBackGroundColorType(ccui.Layout.BG_COLOR_SOLID);
 		lay.setBackGroundColor(new cc.Color(180,180,180,255));
